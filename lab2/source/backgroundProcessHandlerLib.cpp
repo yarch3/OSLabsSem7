@@ -1,4 +1,4 @@
-#include "backgroundProcessHandlerLib.h"
+#include "../header/backgroundProcessHandlerLib.h"
 #include <cstring>
 #include <cstdlib>
 
@@ -9,8 +9,7 @@
     #include <errno.h>
 #endif
 
-
-int runBackGroundProcess(const char* command, ProcessHandler* handler) {
+int runBackgroundProcess(const char* command, ProcessHandler* handler) {
 #ifdef _WIN32
     STARTUPINFO startInfo;
     ZeroMemory(&startInfo, sizeof(startInfo));
@@ -31,7 +30,7 @@ int runBackGroundProcess(const char* command, ProcessHandler* handler) {
     ) {
         return -1;
     }
-    handler->finished = false;
+    handler->isFinished = false;
     return 0;
 #else
     handler->procId = fork();
@@ -51,11 +50,11 @@ int waitProcessEnd(ProcessHandler* handler) {
 #ifdef _WIN32
     DWORD result = WaitForSingleObject(handler->procInfo.hProcess, INFINITE);
     if (result == WAIT_OBJECT_0) {
-        GetExitCodeProcess(handler->procInfo.hProcess, (LPDWORD)&handler->exit_code);
+        GetExitCodeProcess(handler->procInfo.hProcess, (LPDWORD)&handler->exitCode);
         CloseHandle(handler->procInfo.hProcess);
         CloseHandle(handler->procInfo.hThread);
-        handler->finished = true;
-        return handler->exit_code;
+        handler->isFinished = true;
+        return handler->exitCode;
     }
     return -1;
 #else

@@ -1,23 +1,26 @@
-if(WIN32)
-    set(MINGW_PATH "C:/mingw64/bin")
-    set(CMAKE_C_COMPILER "${MINGW_PATH}/gcc.exe")
-    set(CMAKE_CXX_COMPILER "${MINGW_PATH}/g++.exe")
-endif()
+cmake_minimum_required(VERSION 3.10)
+project(BackgroundProcessApp)
 
-cmake_minimum_required(VERSION 3.28)
-project(lab CXX)
-
-set(CMAKE_CXX_STANDARD 23)
+# Установка стандарта C++ (используем C++11 для совместимости)
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(CMAKE_BUILD_TYPE Debug)
+# Создание исполняемого файла
+add_executable(${PROJECT_NAME}
+    main.cpp
+    source/backgroundProcessHandlerLib.cpp
+)
 
-add_library(backgroundProcessHandlerLib source/backgroundProcessHandlerLib.cpp)
-target_include_directories(backgroundProcessHandlerLib PUBLIC include)
+# Включаем директории с заголовками
+target_include_directories(${PROJECT_NAME} PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/header
+)
 
+# Настройки для Windows
 if(WIN32)
-    target_compile_definitions(backgroundProcessHandlerLib PRIVATE _WIN32)
+    # Windows требует дополнительные настройки для CreateProcess
+    add_definitions(-D_WIN32_WINNT=0x0600)  # Минимальная версия Windows Vista
+else()
+    # Настройки для Unix/Linux/MacOS
+    add_definitions(-D_POSIX_C_SOURCE=200809L)
 endif()
-
-add_executable(lab2 main.cpp)
-target_link_libraries(lab2 backgroundProcessHandlerLib)
